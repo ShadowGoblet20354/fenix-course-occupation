@@ -5,6 +5,7 @@ import json
 from datetime import datetime
 import argparse
 
+# Course IDs, found manually
 course_ids = {'SD':  "846035542880512",
               'ES':  "846035542880731",
               'IA':  "846035542880601",
@@ -12,6 +13,7 @@ course_ids = {'SD':  "846035542880512",
               'CG':  "846035542880469",
               'BD':  "846035542880592"}
 
+# Define command line arguments
 parser = argparse.ArgumentParser(description="Get occupation data for a given course")
 parser.add_argument("course", help="Course name abbreviation", type=str, choices=course_ids.keys())
 parser.add_argument("-s", "--startswith", help="Show only results that start with given string")
@@ -20,9 +22,11 @@ parser.add_argument("-x", "--exclude", help="Show only results which don't conta
 parser.add_argument("-v", "--verbose", help="Show campus information next to each shift", action="store_true")
 args = parser.parse_args()
 
+# Do API request for course data
 target_id = course_ids[args.course]
 fenix_req = requests.get("https://fenix.tecnico.ulisboa.pt/api/fenix/v1/courses/{}/schedule?academicTerm=2021/2022&lang=pt-PT".format(target_id))
 
+# Convert command line campus name to API campus name
 if not args.campus is None and args.campus == "alameda":
     target_campus = "Alameda"
 elif not args.campus is None and args.campus == "tagus":
@@ -30,14 +34,19 @@ elif not args.campus is None and args.campus == "tagus":
 else:
     target_campus = None
 
+# Load response to json object
 fenix_json = json.loads(fenix_req.text)
 print(datetime.now().strftime("%Y-%m-%d %H:%M:%S\n"))
 
-
+# Keep track of how many students managed to enroll and what the total capacity is
 enrolled = 0
 total = 0
+
+# Loop through each shift found for given course
 for shift in fenix_json['shifts']:
     name = shift['name']
+
+    # If startswith argument was given, verify condition
     if not args.startswith is None and not name.startswith(args.startswith):
         continue
     if not args.exclude is None and args.exclude in name:
@@ -47,15 +56,18 @@ for shift in fenix_json['shifts']:
     maximum = shift['occupation']['max']
     campus  = shift['rooms'][0]['topLevelSpace']['name']
 
+    # If campus argument was given, verify condition
     if not target_campus is None and target_campus != campus:
         continue
 
     enrolled += current
     total += maximum
 
+    # Print shift info to stdout
     if args.verbose:
         print("{:6} - {:3}/{:3} ({})".format(name, current, maximum, campus))
     else:
         print("{:6} - {:3}/{:3}".format(name, current, maximum))
 
+# Print global vacancy info to stdout
 print("\nTotal  - {:3}/{:3}".format(enrolled, total))
