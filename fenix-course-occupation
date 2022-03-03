@@ -26,6 +26,11 @@ args = parser.parse_args()
 target_id = course_ids[args.course]
 fenix_req = requests.get("https://fenix.tecnico.ulisboa.pt/api/fenix/v1/courses/{}/schedule?academicTerm=2021/2022&lang=pt-PT".format(target_id))
 
+# Check if server responded correctly
+if fenix_req.status_code != 200:
+    print("Error: could not fetch course info. Server responded with {} - {}".format(fenix_req.status_code, fenix_req.reason))
+    exit()
+
 # Convert command line campus name to API campus name
 if not args.campus is None and args.campus == "alameda":
     target_campus = "Alameda"
