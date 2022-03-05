@@ -18,6 +18,7 @@ parser = argparse.ArgumentParser(description="Get occupation data for a given co
 parser.add_argument("course", help="Course name abbreviation", type=str, choices=course_ids.keys())
 parser.add_argument("-s", "--startswith", help="Show only results that start with given string")
 parser.add_argument("-c", "--campus", help="Show only results with classes on the given campus", type=str, choices=["alameda", "tagus"])
+parser.add_argument("-C", "--contains", help="Show only results which contain given string", type=str)
 parser.add_argument("-x", "--exclude", help="Show only results which don't contain given string", type=str)
 parser.add_argument("-v", "--verbose", help="Show campus information next to each shift", action="store_true")
 args = parser.parse_args()
@@ -51,10 +52,12 @@ total = 0
 for shift in fenix_json['shifts']:
     name = shift['name']
 
-    # If startswith argument was given, verify condition
+    # If 'startswith', 'exclude' or 'contains' argument were given, verify conditions
     if not args.startswith is None and not name.startswith(args.startswith):
         continue
     if not args.exclude is None and args.exclude in name:
+        continue
+    if not args.contains is None and not args.contains in name:
         continue
 
     current = shift['occupation']['current']
