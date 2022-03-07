@@ -16,9 +16,9 @@ course_ids = {'SD':  "846035542880512",
 # Define command line arguments
 parser = argparse.ArgumentParser(description="Get occupation data for a given course")
 parser.add_argument("course", help="Course name abbreviation", type=str, choices=course_ids.keys())
-parser.add_argument("-s", "--startswith", help="Show only results that start with given string")
-parser.add_argument("-c", "--campus", help="Show only results with classes on the given campus", type=str, choices=["alameda", "tagus"])
 parser.add_argument("-a", "--available", help="Show only available shifts (which are not with full capacity)", action="store_true")
+parser.add_argument("-c", "--campus", help="Show only results with classes on the given campus", type=str, choices=["alameda", "tagus"])
+parser.add_argument("-s", "--startswith", help="Show only results that start with given string")
 parser.add_argument("-C", "--contains", help="Show only results which contain given string", type=str)
 parser.add_argument("-x", "--exclude", help="Show only results which don't contain given string", type=str)
 parser.add_argument("-v", "--verbose", help="Show campus information next to each shift", action="store_true")
