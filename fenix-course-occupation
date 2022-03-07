@@ -18,6 +18,7 @@ parser = argparse.ArgumentParser(description="Get occupation data for a given co
 parser.add_argument("course", help="Course name abbreviation", type=str, choices=course_ids.keys())
 parser.add_argument("-s", "--startswith", help="Show only results that start with given string")
 parser.add_argument("-c", "--campus", help="Show only results with classes on the given campus", type=str, choices=["alameda", "tagus"])
+parser.add_argument("-a", "--available", help="Show only available shifts (which are not with full capacity)", action="store_true")
 parser.add_argument("-C", "--contains", help="Show only results which contain given string", type=str)
 parser.add_argument("-x", "--exclude", help="Show only results which don't contain given string", type=str)
 parser.add_argument("-v", "--verbose", help="Show campus information next to each shift", action="store_true")
@@ -64,8 +65,10 @@ for shift in fenix_json['shifts']:
     maximum = shift['occupation']['max']
     campus  = shift['rooms'][0]['topLevelSpace']['name']
 
-    # If campus argument was given, verify condition
+    # If 'campus' or 'avaliable' argument was given, verify condition
     if not target_campus is None and target_campus != campus:
+        continue
+    if args.available and current == maximum:
         continue
 
     enrolled += current
